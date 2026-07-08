@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faMultiply, faDivide, faUndo, faStar } from '@fortawesome/free-solid-svg-icons';
 import OpsAndStars from './operations';
 import Modal from './modals';
+import { API_URL } from '../config';
 
 // one million props :/
 export default function Digits({ numbers, target, activeTab, setActiveTab, puzzleNum, puzzleDist, calcDist, reset, resetMe, allOpEmojis, addEmoji, closeNum, setCloseNum, clipboard, generateClipboard }) {
@@ -31,12 +32,12 @@ export default function Digits({ numbers, target, activeTab, setActiveTab, puzzl
     // sends statistics over for puzzle when submit button is pressed
     const addPuzzle = async (puzzleNum, stars, numOps) => {
         try {
-            const response = await axios.post('http://localhost:8080/api/add_puzzle', {
+            const response = await axios.post(`${API_URL}/api/add_puzzle`, {
                 puzzleNum: puzzleNum,
                 stars: stars,
                 numOps: numOps,
             }, {
-                withCredentials: true,
+                headers: { 'X-User-Id': localStorage.getItem('userId') },
               });
         } catch (error) {
             // ruh roh

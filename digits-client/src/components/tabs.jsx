@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faQuestion, faGear, faChartSimple } from '@fortawesome/free-solid-svg-icons';
 import Modal from './modals';
+import { API_URL } from '../config';
 
 export default function Tabs({ numbers, activeTab, setActiveTab, puzzleDist }) {
     // toggles the different modals
@@ -17,7 +18,9 @@ export default function Tabs({ numbers, activeTab, setActiveTab, puzzleDist }) {
 
     // gets user's statistics from back-end when stats modal is opened.
     const getStats = async () => {
-        const response = await axios.get("http://localhost:8080/api/get_stats", { withCredentials: true, });
+        const response = await axios.get(`${API_URL}/api/get_stats`, {
+            headers: { 'X-User-Id': localStorage.getItem('userId') },
+        });
         setStatsList(response.data);
     };
 

@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -6,14 +7,15 @@ from datetime import datetime
 import uuid
 
 app = Flask(__name__)
-cors = CORS(app, origins='*', supports_credentials=True)
+cors = CORS(app, origins='*')
+DB_PATH = os.environ.get("DB_PATH", "puzzles.db")
 
 # sends puzzles to the front-end upon loading
 @app.route("/api/data", methods=['GET'])
 def generatePuzzles():
     puzzles = []
     # connects to database in read-only mode so add_puzzle can write data
-    conn = sqlite3.connect('file:puzzles.db?mode=ro', uri=True)
+    conn = sqlite3.connect(f'file:{DB_PATH}?mode=ro', uri=True)
     cursor = conn.cursor()
     # creates seed so that every time a person visits within the same hour, they get the same puzzles
     random.seed(int(datetime.today().strftime("%Y%m%H%d")))
@@ -35,7 +37,7 @@ def createKey():
 @app.route('/api/add_puzzle', methods=['POST'])
 def addPuzzle():
     # getting all the variables from frontend
-    id = request.cookies.get('id')
+    id = request.headers.get('X-User-Id')
     puzzleNum = request.json.get('puzzleNum')
     stars = request.json.get('stars')
     numOps = request.json.get('numOps')
@@ -44,7 +46,7 @@ def addPuzzle():
     date = today.strftime('%Y-%m-%d')
     hour = today.strftime('%H')
     # enter information into database
-    conn = sqlite3.connect('puzzles.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO games (id, date, hour, puzzle, stars, ops) VALUES (?, ?, ?, ?, ?, ?)", [id, date, hour, puzzleNum, stars, numOps])
     conn.commit()
@@ -56,8 +58,8 @@ def addPuzzle():
 @app.route("/api/get_stats", methods=['GET'])
 def getStats():
     # get user id + connect to db
-    id = str(request.cookies.get('id'))
-    conn = sqlite3.connect('file:puzzles.db?mode=ro', uri=True)
+    id = str(request.headers.get('X-User-Id'))
+    conn = sqlite3.connect(f'file:{DB_PATH}?mode=ro', uri=True)
     cursor = conn.cursor()
     # get # unique puzzles played, # of days played, average # of ops, and # of games where n number of stars were attained
     uniquePuzzles = cursor.execute("SELECT COUNT(*) AS uniquePuzzles FROM (SELECT DISTINCT date, hour, puzzle FROM games WHERE id = ?)", (id,)).fetchone()[0]

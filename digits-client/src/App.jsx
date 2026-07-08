@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Digits from './components/digits.jsx';
 import Tabs from './components/tabs.jsx';
 import axios from "axios";
+import { API_URL } from './config';
 import './tailwind.css';
 
 export default function App() {
@@ -23,23 +24,14 @@ export default function App() {
   
   // gets puzzles from backend
   const getPuzzles = async() => {
-    const response = await axios.get("http://localhost:8080/api/data");
+    const response = await axios.get(`${API_URL}/api/data`);
     getNumbers(response.data.puzzles);
   } 
 
-  // fetches cookie to get user id (id expires after 30 days of last reference)
   const fetchId = async() => {
-    const meWantCookie = document.cookie.split('; ').reduce((acc, cookie) => {
-      const [key, value] = cookie.split('=');
-      acc[key] = value;
-      return acc;
-    }, {});
-    
-    // if such a cookie does not exist, generate a user id
-    if (!meWantCookie.id) {
-      const response = await axios.get("http://localhost:8080/api/create_id");
-      const { id } = response.data;
-      document.cookie = `id=${id}; path=/; max-age=${24*60*60*30}; SameSite=Lax;`;
+    if (!localStorage.getItem('userId')) {
+      const response = await axios.get(`${API_URL}/api/create_id`);
+      localStorage.setItem('userId', response.data.id);
     }
   }
 
