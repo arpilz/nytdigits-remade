@@ -1,0 +1,14 @@
+name: Delete 60+ Days Inactive Users
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call deletion endpoint
+        run: |
+          curl -X POST https://nytdigits-remade-production.up.railway.app/api/delete_old \
+            -H "X-Deletion-Secret: ${{ secrets.DEL_OLD }}"

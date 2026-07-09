@@ -9,6 +9,7 @@ import uuid
 app = Flask(__name__)
 cors = CORS(app, origins='*')
 DB_PATH = os.environ.get("DB_PATH", "puzzles.db")
+DEL_OLD = os.environ.get("DEL_OLD", "test")
 
 # sends puzzles to the front-end upon loading
 @app.route("/api/data", methods=['GET'])
@@ -80,6 +81,20 @@ def getStats():
         "twoStar": nStar[1],
         "threeStar": nStar[2],
     })
+
+# deleting data from users who haven't played in 60 days
+@app.route("/api/delete_old", methods=['POST'])
+def cleanup():
+    if request.headers.get('X-Deletion-Secret') != DEL_OLD:
+        return "Unauthorized", 401
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM games WHERE id IN (SELECT id FROM games GROUP BY id HAVING MAX(date) < date('now', '-60 days'))")
+    deleted = cursor.rowcount
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"rowsDeleted": deleted})
 
 # ensures flask runs on port 8080
 if __name__ == "__main__":
