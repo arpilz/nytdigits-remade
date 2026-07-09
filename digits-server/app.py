@@ -9,7 +9,7 @@ import uuid
 app = Flask(__name__)
 cors = CORS(app, origins='*')
 DB_PATH = os.environ.get("DB_PATH", "puzzles.db")
-DEL_OLD = os.environ.get("DEL_OLD", "test")
+DEL_OLD = os.environ.get("DEL_OLD")
 
 # sends puzzles to the front-end upon loading
 @app.route("/api/data", methods=['GET'])
