@@ -20,10 +20,10 @@ def generatePuzzles():
     cursor = conn.cursor()
     # creates seed so that every time a person visits within the same hour, they get the same puzzles
     random.seed(int(datetime.today().strftime("%Y%m%H%d")))
-    randInt = random.random()
     for n in range(1,6):
+        randInt = random.random()
         # gets puzzles
-        puzzles.append(list(cursor.execute(f"SELECT target, val1, val2, val3, val4, val5, val6 FROM puzzle{n} WHERE id = CAST({randInt*1/n}*(SELECT MAX(id) FROM puzzle{n}) AS INTEGER) LIMIT 1").fetchone()))
+        puzzles.append(list(cursor.execute(f"SELECT target, val1, val2, val3, val4, val5, val6 FROM puzzle{n} WHERE id = CAST({randInt}*(SELECT MAX(id) FROM puzzle{n}) AS INTEGER) LIMIT 1").fetchone()))
     cursor.close()
     conn.close()
     return jsonify({"puzzles": puzzles})
