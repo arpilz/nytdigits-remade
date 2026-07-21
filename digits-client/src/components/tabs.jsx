@@ -5,6 +5,28 @@ import { faStar, faQuestion, faGear, faChartSimple } from '@fortawesome/free-sol
 import Modal from './modals';
 import { API_URL } from '../config';
 
+function StarBar({ count, total }) {
+    const pct = count / total * 100;
+    const isMobile = window.innerWidth < 768;
+    const threshold = isMobile ? 18 : 8;
+    const isNarrow = pct < threshold;
+
+    return (
+        <div className="w-full h-full flex items-center text-end">
+            <div
+                style={{ width: `${pct}%` }}
+                className={`rounded-md bg-gray-400 h-full flex items-center justify-end content-center ${isNarrow ? "" : "pr-2 truncate"}`}
+            >
+                {!isNarrow && <span className="text-black leading-none lg:-translate-y-[2px] -translate-y-[1px]">{pct.toFixed()}%</span>}
+            </div>
+            {isNarrow && (
+                <span className="pl-1 dark:text-white whitespace-nowrap leading-none lg:-translate-y-[2px] -translate-y-[1px]">{pct.toFixed()}%</span>
+            )}
+        </div>
+    );
+}
+
+
 export default function Tabs({ numbers, activeTab, setActiveTab, puzzleDist }) {
     // toggles the different modals
     const [isHelpOpen, setHelp] = useState(false);
@@ -167,25 +189,13 @@ export default function Tabs({ numbers, activeTab, setActiveTab, puzzleDist }) {
         <div className={`${statsList["numGames"] === 0 ? "hidden": ""} inline-grid grid-cols-[auto_minmax(0,1fr)] grid-rows-3 gap-x-3 gap-y-1 text-end`}>
             {/* one star bar */}
             <div className="text-yellowgreen text-xl"><FontAwesomeIcon icon={ faStar } /></div>
-            <div className="w-full h-full flex text-end">
-                <div style= {{width: `${statsList["oneStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100}%`}} className="rounded-md bg-gray-400 text-black h-full pr-2 truncate">
-                    {(statsList["oneStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100).toFixed()}%
-                </div>
-            </div>
+            <StarBar count={statsList["oneStar"]} total={statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"]} />
             {/* two star bar */}
             <div className="text-yellowgreen text-xl"><FontAwesomeIcon icon={ faStar } /><FontAwesomeIcon icon={ faStar } /></div>
-            <div className="w-full h-full flex text-end">
-                <div style= {{width: `${statsList["twoStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100}%`}} className="rounded-md bg-gray-400 text-black h-full pr-2 truncate">
-                    {(statsList["twoStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100).toFixed()}%
-                </div>
-            </div>
+            <StarBar count={statsList["twoStar"]} total={statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"]} />
             {/* three star bar */}
             <div className="text-yellowgreen text-xl"><FontAwesomeIcon icon={ faStar } /><FontAwesomeIcon icon={ faStar } /><FontAwesomeIcon icon={ faStar } />  </div>
-            <div className="w-full h-full flex text-end">
-                <div style= {{width: `${statsList["threeStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100}%`}} className="rounded-md bg-gray-400 text-black h-full pr-2 truncate">
-                    {(statsList["threeStar"]/(statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"])*100).toFixed()}%
-                </div>
-            </div>
+            <StarBar count={statsList["threeStar"]} total={statsList["oneStar"] + statsList["twoStar"] + statsList["threeStar"]} />
         </div>
         </>} open = {setStats} isOpen = {isStatsOpen} />
         </>

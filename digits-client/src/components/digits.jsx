@@ -187,11 +187,6 @@ export default function Digits({ numbers, target, activeTab, setActiveTab, puzzl
     useEffect(() => {
         if (secondNum != null) {
             const xCalc = secondNum % 3 - (selectedNum % 3);
-            {/* so i know that you're thinking these huges switches look so stupid. and i agree. but if i set the state dynamically
-                in ANY WAY, it would be too slow and the number wouldn't update with the correct animation. trust me, i spent four hours
-                trying to find a dynamic interpolation method but it is just too slow. and i know it's a speed issue (the default usestate
-                will work, as will any static string. it's not an issue with anything else). this is actually the only way to get it fast 
-                enough to work properly. */}
             if (secondNum >= 3 && selectedNum < 3) {
                 switch(xCalc) {
                     case 2:
